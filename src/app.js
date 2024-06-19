@@ -17,5 +17,3 @@ app.use("/Operator", routes.OperatorRoutes)
 app.listen(port, () => {
     console.log("Uh oh")
 })
-
-module.exports = app;
