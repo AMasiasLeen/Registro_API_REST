@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "node src/app.js"
+    "dev": "node src/app.js",
+    "build": "echo 'No build step defined'",
+    "test": "echo 'No tests defined'",
+    "lint": "eslint ."
   },
   "keywords": [],
   "author": "",
@@ -16,5 +19,8 @@
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.3",
     "sequelize-cli": "^6.6.2"
+  },
+  "devDependencies": {
+    "eslint": "^7.32.0"
   }
 }
