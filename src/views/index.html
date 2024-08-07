@@ -1,33 +1,62 @@
+<!DOCTYPE html>
 <html>
 <head>
-  <meta name="google-signin-client_id" content="YOUR_CLIENT_ID.apps.googleusercontent.com">
+  <title>Registro Maquinaria - Inicio</title>
 </head>
 <body>
-  <div id="my-signin2"></div>
+  <div id="g_id_onload"
+     data-client_id="789939941065-k7hf73vttd4bo4qifn3nclb7ff8siq7o.apps.googleusercontent.com"
+     data-context="signin"
+     data-ux_mode="popup"
+     data-callback="onSuccess"
+     data-auto_prompt="false">
+  </div>
 
+  <div class="g_id_signin"
+     data-type="standard"
+     data-shape="rectangular"
+     data-theme="outline"
+     data-text="signin_with"
+     data-size="large"
+     data-logo_alignment="left">
+  </div>
+
+  <div id="user-info" style="display: none;">
+    <h2>Información del Usuario</h2>
+    <p>Nombre: <span id="user-name"></span></p>
+    <p>Email: <span id="user-email"></span></p>
+    <p>ID: <span id="user-id"></span></p>
+    <img id="user-picture" src="" alt="Foto del usuario">
+  </div>
+
+  <script src="https://accounts.google.com/gsi/client" async></script>
 
   <script>
-    function onSuccess(googleUser) {
-      console.log('Logged in as: ' + googleUser.getBasicProfile().getName());
-      let h1 = document.createElement("h1")
-      
+    function onSuccess(token) {
+      console.log(token.credential);
+      fetch('https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=' + token.credential)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('Información del usuario:', data);
+          document.getElementById('user-name').textContent = data.name;
+          document.getElementById('user-email').textContent = data.email;
+          document.getElementById('user-id').textContent = data.sub;
+          document.getElementById('user-picture').src = data.picture;
+          document.getElementById('user-info').style.display = 'block';
+        })
+        .catch(error => {
+          console.error('Error al obtener la información del usuario:', error.message);
+        });
     }
+
     function onFailure(error) {
       console.log(error);
     }
-    function renderButton() {
-      gapi.signin2.render('my-signin2', {
-        'scope': 'profile email',
-        'width': 240,
-        'height': 50,
-        'longtitle': true,
-        'theme': 'dark',
-        'onsuccess': onSuccess,
-        'onfailure': onFailure
-      });
-    }
   </script>
-
-  <script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
 </body>
 </html>

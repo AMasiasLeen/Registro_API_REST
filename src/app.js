@@ -1,20 +1,24 @@
-require("dotenv").config()
+require("dotenv").config();
 
-const express = require("express")
-const port = process.env.APP_PORT
-const app = express()
-const jwt = require('jsonwebtoken');
+const express = require("express");
+const session = require('express-session');
 
-const path = require("path")
-
-app.use(express.json());
-
-
+const path = require("path");
 const routes = require('./routes');
 
-app.get("/login", (req, res) => {
-    res.sendFile(path.join(__dirname, "views","index.html"))
-})
+const app = express();
+const port = process.env.APP_PORT;
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Configuración de sesiones
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'your_session_secret',
+    resave: false,
+    saveUninitialized: true
+}));
+
 
 
 // Middleware para autenticar usuarios
@@ -34,16 +38,18 @@ const authenticateJWT = (req, res, next) => {
     }
 };
 
-app.use("/Machinery", routes.MachineryRoutes)
-app.use("/Register", routes.RegisterRoutes)
-app.use("/Owner", routes.OwnerRoutes)
-app.use("/Operator", routes.OperatorRoutes)
-app.use("OwnerUser",routes.UserRoutes)
+// Rutas protegidas
+app.use("/Machinery", authenticateJWT, routes.MachineryRoutes);
+app.use("/Register", authenticateJWT, routes.RegisterRoutes);
+app.use("/Owner", authenticateJWT, routes.OwnerRoutes);
+app.use("/Operator", authenticateJWT, routes.OperatorRoutes);
+app.use("/OwnerUser", authenticateJWT, routes.UserRoutes);
+
+// Ruta para el login
+app.get("/login", (req, res) => {
+    res.sendFile(path.join(__dirname, "views", "index.html"));
+});
 
 app.listen(port, () => {
-    console.log("Server Online!")
-})
-
-
-
-
+    console.log("Server Online!");
+});
